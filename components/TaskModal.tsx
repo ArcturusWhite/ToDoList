@@ -42,11 +42,7 @@ export function TaskModal({ mode, initialValue, onClose, onSubmit }: TaskModalPr
 
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-slate-950/30 px-3 pb-3 pt-10 backdrop-blur-sm sm:items-center">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-lg rounded-[8px] bg-white shadow-2xl ring-1 ring-slate-200"
-        aria-label={mode === "create" ? "Create task" : "Edit task"}
-      >
+      <form onSubmit={handleSubmit} className="w-full max-w-lg rounded-[8px] bg-white shadow-2xl ring-1 ring-slate-200" aria-label={mode === "create" ? "Create task" : "Edit task"}>
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
           <div>
             <p className="text-sm font-medium text-slate-500">{mode === "create" ? "New task" : "Update task"}</p>
@@ -123,17 +119,10 @@ export function TaskModal({ mode, initialValue, onClose, onSubmit }: TaskModalPr
         </div>
 
         <div className="flex items-center justify-end gap-2 border-t border-slate-200 px-4 py-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="h-11 rounded-[8px] px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-          >
+          <button type="button" onClick={onClose} className="h-11 rounded-[8px] px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950">
             Cancel
           </button>
-          <button
-            type="submit"
-            className="h-11 rounded-[8px] bg-slate-950 px-5 text-sm font-semibold text-white shadow-soft transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-300"
-          >
+          <button type="submit" className="h-11 rounded-[8px] bg-slate-950 px-5 text-sm font-semibold text-white shadow-soft transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-300">
             {mode === "create" ? "Create task" : "Save changes"}
           </button>
         </div>

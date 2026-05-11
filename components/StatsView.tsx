@@ -61,15 +61,11 @@ export function StatsView({ tasks }: StatsViewProps) {
                     {priority}
                   </div>
                   <span className="font-semibold text-slate-500">
-                    {count} · {percent}%
+                    {count} / {percent}%
                   </span>
                 </div>
                 <div className="mt-2 h-2 rounded-full bg-slate-100">
-                  <div
-                    className={`h-full rounded-full ${styles.dot} transition-all duration-500`}
-                    style={{ width: `${percent}%` }}
-                    aria-hidden="true"
-                  />
+                  <div className={`h-full rounded-full ${styles.dot} transition-all duration-500`} style={{ width: `${percent}%` }} aria-hidden="true" />
                 </div>
               </div>
             );

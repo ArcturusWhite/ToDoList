@@ -19,9 +19,7 @@ export function TaskCard({ task, onToggleComplete, onEdit, onDelete }: TaskCardP
   return (
     <article
       className={`rounded-[8px] border bg-white p-4 shadow-soft transition duration-200 ${
-        task.completed
-          ? "border-slate-200 opacity-60 grayscale"
-          : `${styles.border} hover:-translate-y-0.5 hover:shadow-lg`
+        task.completed ? "border-slate-200 opacity-60 grayscale" : `${styles.border} hover:-translate-y-0.5 hover:shadow-lg`
       }`}
     >
       <div className="flex items-start gap-3">
@@ -45,16 +43,10 @@ export function TaskCard({ task, onToggleComplete, onEdit, onDelete }: TaskCardP
               <span className={`h-2 w-2 rounded-full ${styles.dot}`} aria-hidden="true" />
               {styles.label}
             </span>
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500">
-              {task.status}
-            </span>
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500">{task.status}</span>
           </div>
 
-          <h3
-            className={`mt-3 break-words text-base font-semibold leading-snug text-slate-950 ${
-              task.completed ? "text-slate-500 line-through" : ""
-            }`}
-          >
+          <h3 className={`mt-3 break-words text-base font-semibold leading-snug text-slate-950 ${task.completed ? "text-slate-500 line-through" : ""}`}>
             {task.title}
           </h3>
 
@@ -75,17 +67,9 @@ export function TaskCard({ task, onToggleComplete, onEdit, onDelete }: TaskCardP
         </button>
       </div>
 
-      <div
-        className={`grid transition-all duration-200 ease-out ${
-          isExpanded ? "grid-rows-[1fr] pt-4 opacity-100" : "grid-rows-[0fr] opacity-0"
-        }`}
-      >
+      <div className={`grid transition-all duration-200 ease-out ${isExpanded ? "grid-rows-[1fr] pt-4 opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
         <div className="overflow-hidden">
-          <p
-            className={`whitespace-pre-wrap break-words rounded-[8px] bg-slate-50 p-3 text-sm leading-6 text-slate-600 ${
-              task.completed ? "line-through" : ""
-            }`}
-          >
+          <p className={`whitespace-pre-wrap break-words rounded-[8px] bg-slate-50 p-3 text-sm leading-6 text-slate-600 ${task.completed ? "line-through" : ""}`}>
             {task.description || "No detailed description added."}
           </p>
 

@@ -163,9 +163,7 @@ export default function Home() {
             type="button"
             onClick={() => setActiveView("pending")}
             className={`flex min-h-11 items-center justify-center gap-2 rounded-[7px] px-3 text-sm font-semibold transition ${
-              activeView === "pending"
-                ? "bg-white text-slate-950 shadow-sm"
-                : "text-slate-500 hover:text-slate-800"
+              activeView === "pending" ? "bg-white text-slate-950 shadow-sm" : "text-slate-500 hover:text-slate-800"
             }`}
           >
             <ClipboardList className="h-4 w-4" aria-hidden="true" />
@@ -175,9 +173,7 @@ export default function Home() {
             type="button"
             onClick={() => setActiveView("progress")}
             className={`flex min-h-11 items-center justify-center gap-2 rounded-[7px] px-3 text-sm font-semibold transition ${
-              activeView === "progress"
-                ? "bg-white text-slate-950 shadow-sm"
-                : "text-slate-500 hover:text-slate-800"
+              activeView === "progress" ? "bg-white text-slate-950 shadow-sm" : "text-slate-500 hover:text-slate-800"
             }`}
           >
             <Timer className="h-4 w-4" aria-hidden="true" />

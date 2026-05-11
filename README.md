@@ -1,6 +1,6 @@
 # TodoList
 
-TodoList is a mobile-first PWA task manager built with Next.js and Tailwind CSS. It is designed for professional work tracking with a clean interface inspired by Todoist and Notion.
+TodoList is a mobile-first PWA task manager built with Next.js 15.3.6 and Tailwind CSS. It is designed for professional work tracking with a clean interface inspired by Todoist and Notion.
 
 ## Features
 
@@ -16,15 +16,8 @@ TodoList is a mobile-first PWA task manager built with Next.js and Tailwind CSS.
 
 ## Getting Started
 
-Install dependencies:
-
 ```bash
 npm install
-```
-
-Run the development server:
-
-```bash
 npm run dev
 ```
 
@@ -35,25 +28,3 @@ npm run build
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Project Structure
-
-```text
-app/
-  globals.css
-  layout.tsx
-  page.tsx
-components/
-  BottomNav.tsx
-  EmptyState.tsx
-  StatsView.tsx
-  TaskCard.tsx
-  TaskModal.tsx
-lib/
-  task-utils.ts
-  types.ts
-public/
-  manifest.json
-  sw.js
-  icons/
-```
