@@ -1,27 +1,28 @@
 "use client";
 
-import { useState } from "react";
 import { Check, ChevronDown, Circle, Pencil, Trash2 } from "lucide-react";
 import { formatDate, priorityStyles } from "@/lib/task-utils";
 import type { Task } from "@/lib/types";
 
 type TaskCardProps = {
   task: Task;
+  isExpanded: boolean;
   onToggleComplete: (taskId: string) => void;
+  onToggleExpand: (taskId: string) => void;
   onEdit: (task: Task) => void;
   onDelete: (taskId: string) => void;
 };
 
-export function TaskCard({ task, onToggleComplete, onEdit, onDelete }: TaskCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+export function TaskCard({ task, isExpanded, onToggleComplete, onToggleExpand, onEdit, onDelete }: TaskCardProps) {
   const styles = priorityStyles[task.priority];
 
   return (
     <article
-      className={`rounded-[8px] border bg-white p-4 shadow-soft transition duration-200 ${
-        task.completed ? "border-slate-200 opacity-60 grayscale" : `${styles.border} hover:-translate-y-0.5 hover:shadow-lg`
+      className={`relative overflow-hidden rounded-[8px] border p-4 pl-5 shadow-soft transition duration-200 ${
+        task.completed ? "border-slate-200 bg-slate-100 opacity-60 grayscale" : `${styles.border} ${styles.card} hover:-translate-y-0.5 hover:shadow-lg`
       }`}
     >
+      <span className={`absolute inset-y-0 left-0 w-2 ${task.completed ? "bg-slate-300" : styles.band}`} aria-hidden="true" />
       <div className="flex items-start gap-3">
         <button
           type="button"
@@ -39,8 +40,8 @@ export function TaskCard({ task, onToggleComplete, onEdit, onDelete }: TaskCardP
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${styles.badge}`}>
-              <span className={`h-2 w-2 rounded-full ${styles.dot}`} aria-hidden="true" />
+            <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-extrabold uppercase tracking-normal ring-1 ${task.completed ? "bg-slate-200 text-slate-600 ring-slate-300" : styles.badge}`}>
+              <span className={`h-2.5 w-2.5 rounded-full ${task.completed ? "bg-slate-400" : styles.dot}`} aria-hidden="true" />
               {styles.label}
             </span>
             <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500">{task.status}</span>
@@ -58,7 +59,7 @@ export function TaskCard({ task, onToggleComplete, onEdit, onDelete }: TaskCardP
 
         <button
           type="button"
-          onClick={() => setIsExpanded((value) => !value)}
+          onClick={() => onToggleExpand(task.id)}
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           aria-label={isExpanded ? "Collapse task details" : "Expand task details"}
           title={isExpanded ? "Collapse details" : "Expand details"}
