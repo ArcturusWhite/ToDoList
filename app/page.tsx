@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { BarChart3, ChevronsUpDown, ClipboardList, Download, Plus, Timer } from "lucide-react";
+import { BarChart3, ChevronsUpDown, ClipboardList, Download, Plus, Search, Timer, X } from "lucide-react";
 import { BottomNav, type ViewMode } from "@/components/BottomNav";
 import { EmptyState } from "@/components/EmptyState";
 import { StatsView } from "@/components/StatsView";
@@ -108,6 +108,7 @@ export default function Home() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     try {
@@ -135,8 +136,19 @@ export default function Home() {
 
   const visibleTasks = useMemo(() => {
     const status: TaskStatus = activeView === "progress" ? "In Progress" : "Pending";
-    return sortTasks(tasks.filter((task) => task.status === status));
-  }, [activeView, tasks]);
+    const query = searchQuery.trim().toLowerCase();
+    const tabTasks = tasks.filter((task) => task.status === status);
+
+    if (!query) {
+      return sortTasks(tabTasks);
+    }
+
+    return sortTasks(
+      tabTasks.filter((task) =>
+        [task.title, task.description, task.priority, task.status].some((value) => value.toLowerCase().includes(query))
+      )
+    );
+  }, [activeView, searchQuery, tasks]);
 
   const openCreateModal = () => {
     setEditingTask(null);
@@ -263,6 +275,7 @@ export default function Home() {
 
   const currentLabel = activeView === "progress" ? "In Progress Tasks" : "Pending Tasks";
   const taskCountLabel = `${visibleTasks.length} ${visibleTasks.length === 1 ? "task" : "tasks"}`;
+  const hasSearchQuery = searchQuery.trim().length > 0;
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col px-4 pb-28 pt-5 sm:px-6 lg:max-w-5xl">
@@ -325,6 +338,29 @@ export default function Home() {
             </div>
           </div>
 
+          <div className="relative mb-3">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search tasks..."
+              className="h-12 w-full rounded-[8px] border border-slate-200 bg-white pl-10 pr-11 text-base text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-950 focus:ring-4 focus:ring-slate-200"
+              aria-label="Search tasks"
+            />
+            {hasSearchQuery ? (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-[8px] text-slate-500 transition hover:bg-slate-100 hover:text-slate-950"
+                aria-label="Clear search"
+                title="Clear search"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            ) : null}
+          </div>
+
           <div className="mb-4 grid gap-2 sm:flex sm:items-center sm:justify-between">
             <button
               type="button"
@@ -361,14 +397,17 @@ export default function Home() {
             </div>
           ) : (
             <EmptyState
-              title={activeView === "progress" ? "No work in progress" : "Your pending list is clear"}
+              title={hasSearchQuery ? "No tasks found." : activeView === "progress" ? "No work in progress" : "Your pending list is clear"}
               message={
-                activeView === "progress"
+                hasSearchQuery
+                  ? "Try a different title, description, priority, or status."
+                  : activeView === "progress"
                   ? "Start a task and move it here when it needs focused attention."
                   : "Create a task with a priority and enough detail for future you to act fast."
               }
-              actionLabel="Create task"
-              onAction={openCreateModal}
+              actionLabel={hasSearchQuery ? "Clear search" : "Create task"}
+              onAction={hasSearchQuery ? () => setSearchQuery("") : openCreateModal}
+              showActionIcon={!hasSearchQuery}
             />
           )}
         </section>

@@ -7,9 +7,10 @@ type EmptyStateProps = {
   message: string;
   actionLabel: string;
   onAction: () => void;
+  showActionIcon?: boolean;
 };
 
-export function EmptyState({ title, message, actionLabel, onAction }: EmptyStateProps) {
+export function EmptyState({ title, message, actionLabel, onAction, showActionIcon = true }: EmptyStateProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center rounded-[8px] border border-dashed border-slate-300 bg-white px-5 py-12 text-center shadow-soft">
       <div className="relative h-36 w-36">
@@ -31,7 +32,7 @@ export function EmptyState({ title, message, actionLabel, onAction }: EmptyState
         onClick={onAction}
         className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-slate-950 px-5 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-300"
       >
-        <Plus className="h-4 w-4" aria-hidden="true" />
+        {showActionIcon ? <Plus className="h-4 w-4" aria-hidden="true" /> : null}
         {actionLabel}
       </button>
     </div>
