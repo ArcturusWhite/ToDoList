@@ -58,6 +58,11 @@ export function sortTasks(tasks: Task[]) {
       return priorityDelta;
     }
 
+    const titleDelta = a.title.localeCompare(b.title, undefined, { sensitivity: "base" });
+    if (titleDelta !== 0) {
+      return titleDelta;
+    }
+
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 }

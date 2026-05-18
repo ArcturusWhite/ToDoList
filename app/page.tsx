@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { BarChart3, ChevronsUpDown, ClipboardList, Download, Plus, Search, Timer, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { ChangeEvent } from "react";
+import { BarChart3, ChevronsUpDown, ClipboardList, Download, Plus, Search, Timer, Upload, X } from "lucide-react";
 import { BottomNav, type ViewMode } from "@/components/BottomNav";
 import { EmptyState } from "@/components/EmptyState";
 import { StatsView } from "@/components/StatsView";
@@ -20,6 +21,8 @@ const emptyDraft: TaskDraft = {
 };
 
 const reportGroups: TaskStatus[] = ["Pending", "In Progress"];
+const priorities = ["Critical", "Intermediate", "Low"];
+const statuses = ["Pending", "In Progress"];
 
 function escapeHtml(value: string) {
   return value
@@ -101,6 +104,41 @@ function buildReportHtml(tasks: Task[]) {
 </html>`;
 }
 
+function isValidTask(value: unknown): value is Task {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const task = value as Record<string, unknown>;
+  return (
+    typeof task.id === "string" &&
+    typeof task.title === "string" &&
+    typeof task.description === "string" &&
+    typeof task.completed === "boolean" &&
+    typeof task.createdAt === "string" &&
+    typeof task.updatedAt === "string" &&
+    typeof task.priority === "string" &&
+    priorities.includes(task.priority) &&
+    typeof task.status === "string" &&
+    statuses.includes(task.status)
+  );
+}
+
+function parseBackupFileContent(content: string) {
+  const parsed = JSON.parse(content) as unknown;
+  const tasks = Array.isArray(parsed)
+    ? parsed
+    : parsed && typeof parsed === "object" && Array.isArray((parsed as { tasks?: unknown }).tasks)
+    ? (parsed as { tasks: unknown[] }).tasks
+    : null;
+
+  if (!tasks || !tasks.every(isValidTask)) {
+    throw new Error("Invalid backup file. Please choose a TodoList JSON backup with valid task fields.");
+  }
+
+  return tasks as Task[];
+}
+
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeView, setActiveView] = useState<ViewMode>("pending");
@@ -109,6 +147,8 @@ export default function Home() {
   const [isHydrated, setIsHydrated] = useState(false);
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
+  const [backupMessage, setBackupMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     try {
@@ -276,6 +316,58 @@ export default function Home() {
     window.setTimeout(() => URL.revokeObjectURL(url), 500);
   };
 
+  const downloadBackup = () => {
+    const backupDate = new Date().toISOString().slice(0, 10);
+    const backup = {
+      app: "TodoList",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      tasks
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `todolist-backup-${backupDate}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 500);
+    setBackupMessage({ type: "success", text: "Backup exported." });
+  };
+
+  const handleImportBackup = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const content = await file.text();
+      const importedTasks = parseBackupFileContent(content);
+      const shouldImport = window.confirm(
+        `Importing this backup will replace your current local task list with ${importedTasks.length} tasks. Continue?`
+      );
+
+      if (!shouldImport) {
+        setBackupMessage({ type: "error", text: "Import cancelled. Existing tasks were not changed." });
+        return;
+      }
+
+      setTasks(sortTasks(importedTasks));
+      setExpandedTaskIds(new Set());
+      setSearchQuery("");
+      setBackupMessage({ type: "success", text: `Imported ${importedTasks.length} tasks from backup.` });
+    } catch (error) {
+      setBackupMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Invalid backup file. Existing tasks were not changed."
+      });
+    }
+  };
+
   const currentLabel = activeView === "progress" ? "In Progress Tasks" : "Pending Tasks";
   const taskCountLabel = `${visibleTasks.length} ${visibleTasks.length === 1 ? "task" : "tasks"}`;
   const hasSearchQuery = searchQuery.trim().length > 0;
@@ -364,7 +456,7 @@ export default function Home() {
             ) : null}
           </div>
 
-          <div className="mb-4 grid gap-2 sm:flex sm:items-center sm:justify-between">
+          <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             <button
               type="button"
               onClick={toggleAllVisibleTasks}
@@ -382,7 +474,37 @@ export default function Home() {
               <Download className="h-4 w-4" aria-hidden="true" />
               Export Report
             </button>
+            <button
+              type="button"
+              onClick={downloadBackup}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+            >
+              <Download className="h-4 w-4" aria-hidden="true" />
+              Export Backup
+            </button>
+            <button
+              type="button"
+              onClick={() => importInputRef.current?.click()}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+            >
+              <Upload className="h-4 w-4" aria-hidden="true" />
+              Import Backup
+            </button>
+            <input ref={importInputRef} type="file" accept="application/json,.json" onChange={handleImportBackup} className="hidden" aria-label="Import backup file" />
           </div>
+
+          {backupMessage ? (
+            <div
+              className={`mb-4 rounded-[8px] border px-3 py-2 text-sm font-medium ${
+                backupMessage.type === "success"
+                  ? "border-green-200 bg-green-50 text-green-700"
+                  : "border-red-200 bg-red-50 text-red-700"
+              }`}
+              role="status"
+            >
+              {backupMessage.text}
+            </div>
+          ) : null}
 
           {visibleTasks.length > 0 ? (
             <div className="grid gap-3 lg:grid-cols-2">

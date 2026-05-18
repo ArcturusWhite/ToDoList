@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "todolist-pwa";
-const CACHE_VERSION = "2026-05-18-v2";
+const CACHE_VERSION = "2026-05-18-v4";
 const STATIC_CACHE = `${CACHE_PREFIX}-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `${CACHE_PREFIX}-runtime-${CACHE_VERSION}`;
 const CURRENT_CACHES = new Set([STATIC_CACHE, RUNTIME_CACHE]);
